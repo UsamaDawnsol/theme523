@@ -1,0 +1,128 @@
+<div class="index_newsletter_wrapper" {% if section.settings.background_toggle %} style="background-color: {{ section.settings.bg_color }}"{% endif %} {% if section.settings.background_image_toggle %} style="background: url( {{ section.settings.background_image | img_url: '1440x528', crop: 'top' }} );"{% endif %}>
+
+<div class="container">
+	<div class="item__newsletter">
+		<h3>{{ section.settings.title | escape }}</h3>
+		
+		{% case settings.newsletter_form_type %}
+			{% when 'newsletter_shopify' %}
+					{% capture newsletterForm %}
+						{% form 'customer' %}
+							{{ form.errors | default_errors }}
+
+							<p class="alert alert-success">{{ 'layout.footer.newsletter_success' | t }}</p>
+						
+							<p class="form_text">{{ section.settings.text | escape }}</p>
+							<input type="hidden" name="contact[tags]" value="Newsletter subscriber">
+							<div class="form_wrapper">
+								<input type="email" name="contact[email]" class="input-group__field newsletter__input" placeholder="Enter your email">
+								<button class="btn" type="submit">{{ 'layout.footer.subscribe_button' | t }}</button>
+							</div>
+							
+						{% endform %}
+					{% endcapture %}
+
+					{% assign newsletterForm = newsletterForm | replace: "'", "&lsquo;" | replace: 'id="contact_form"', 'id="newsletter_form"' | strip_newlines %}
+
+			{% when 'newsletter_mailchimp' %}
+				{% capture newsletterForm %}
+					<p class="form_text">{{ section.settings.text | escape }}</p>
+					<div class="newsletter_form__mailchimp">
+						<form action="{{ settings.newsletter_mailchimp_url }}" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form">
+							<input required type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Enter your email">
+							<button class="btn" type="submit" name="subscribe" id="mc-embedded-subscribe">{{ 'layout.footer.subscribe_button' | t }}</button>
+						</form>
+					</div>
+				{% endcapture %}
+		{% endcase %}
+
+		{{ newsletterForm }}
+	</div>
+</div>
+
+</div>
+
+{% schema %}
+{
+	"name": "Newsletter",
+	"class": "section section_newsletter",
+	"settings": [
+		{
+			"type": "header",
+			"content": "Newsletter form",
+			"info": "Warning! To avoid errors, please use this section only once."
+		},
+		{
+			"type": "text",
+			"id": "title",
+			"label": "Header text"
+		},
+		{
+			"type": "textarea",
+			"id": "text",
+			"label": "Text"
+		},
+		
+		{
+			"type": "header",
+			"content": "Background image"
+		},
+		{
+			"type": "checkbox",
+			"id": "background_image_toggle",
+			"label": "Show background image",
+			"default": false
+		},
+		{
+			"type": "image_picker",
+			"id": "background_image",
+			"label": "Image",
+			"info": "The image should be more than 2050px wide to resize and crop properly"
+		},
+		{
+			"type": "checkbox",
+			"id": "background_toggle",
+			"label": "Show background color",
+			"default": true
+		},
+		{
+			"type": "color",
+			"id": "bg_color",
+			"label": "Background color",
+			"default": "#FC4747"
+		}
+	],
+	"presets": [
+		{
+			"name": "Newsletter",
+			"category": "Customer"
+		}
+	]
+}
+{% endschema %}
+
+{% javascript %}
+jQuery(document).ready(function($) {
+	
+
+	// CHECK FORM POSTED
+	$('.contact-form').each(function (){      
+		$(this).on('submit', function(e){
+			var formCookie = $(this).attr('class');
+			$.cookie('formSended', formCookie);
+		});
+	});
+	
+	if( document.location.href.indexOf('?customer_posted=true') > 0 && $.cookie('formSended') == 'contact-form') {
+		$('#newsletter_form .form_wrapper').hide();
+		$('#newsletter_form .form_text').hide();
+		$('#newsletter_form .alert-success').show();
+	};
+
+	// FORM VALIDATION
+	$(document).ready(function() {
+		$('#newsletter_form').formValidation();
+	});
+
+});
+{% endjavascript %}
