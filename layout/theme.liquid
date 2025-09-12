@@ -75,6 +75,7 @@
 	</head>
 
 	<body class="template-{{ template | split: '.' | first }} {{ settings.color_scheme }}">
+		{% section 'font' %}
 		<div class="page_wrapper">
 
 			<div id="page_preloader__bg">
