@@ -75,11 +75,10 @@
       "notify_send": "Send"
     },
     "metafield": {
-  "custom": {
-    "bundle_items": "Bundle items"
-  }
-},
-   
+      "custom": {
+        "bundle_items": "Bundle items"
+      }
+    },
     "map": {
       "get_directions": "Get directions"
     },
