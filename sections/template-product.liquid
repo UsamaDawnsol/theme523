@@ -163,6 +163,22 @@
 							</p>
 						{% endif %}
 
+						{% if section.settings.show_bundle and product.metafields.custom.bundle_items %}
+  <div class="single_bundle_items">
+    <b>{{ 'metafield.custom.bundle_items' | t }}:</b>
+    <ul>
+      {% for item in product.metafields.custom.bundle_items.value %}
+        <li>
+          <a href="{{ item.url }}">
+            {{ item.title }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+
 						{% if section.settings.show_tags %}
 							<p class="single_product__tags">
 								<b>{{ 'layout.product.tags' | t }}:</b>
@@ -498,6 +514,11 @@
 			"type": "checkbox",
 			"id": "show_vendor",
 			"label": "Show vendor"
+		},
+			{
+			"type": "checkbox",
+			"id": "show_bundle",
+			"label": "Show Bundles"
 		},
 		{
 			"type": "checkbox",
