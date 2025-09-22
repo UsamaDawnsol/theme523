@@ -1,128 +1,212 @@
 <div class="template_cart">
-	<div class="container">
-		<h1 class="page_heading">{{ page_title }}</h1>
+  <div class="container">
+    <h1 class="page_heading">{{ page_title }}</h1>
 
-		{% if cart.item_count > 0 %}
-			<form action="/cart" method="post" novalidate class="cart">
-				<table class="table table-bordered cart_items">
-					<thead>
-						<tr>
-							<th class="column_product" colspan="2">{{ 'pages.cart.product' | t }}</th>
-							<th class="column_price">{{ 'pages.cart.product_price' | t }}</th>
-							<th class="column_quantity">{{ 'pages.cart.product_quantity' | t }}</th>
-							<th class="column_total">{{ 'pages.cart.product_total' | t }}</th>
-						</tr>
-					</thead>
+    {% if cart.item_count > 0 %}
+      <form action="/cart" method="post" novalidate class="cart">
+        <table class="table table-bordered cart_items">
+          <thead>
+            <tr>
+              <th class="column_product" colspan="2">{{ 'pages.cart.product' | t }}</th>
+              <th class="column_price">{{ 'pages.cart.product_price' | t }}</th>
+              <th class="column_quantity">{{ 'pages.cart.product_quantity' | t }}</th>
+              <th class="column_total">{{ 'pages.cart.product_total' | t }}</th>
+            </tr>
+          </thead>
 
-					<tbody>
-						{% for item in cart.items %}
-							<tr>
-								<td class="column_product_img">
-									<a href="{{ item.url | within: collections.all }}">
-										<img class="cart__image" src="{{ item | img_url: '200x' }}" alt="{{ item.title | escape }}">
-									</a>
-								</td>
+          <tbody>
+            {% assign current_bundle = "" %}
 
-								<td class="column_product_info">
-									<p class="cart_item__name product_name">
-										<a href="{{ item.url }}">{{ item.product.title }}</a>
-									</p>
+            {% for item in cart.items %}
+              {% assign bundle_name = item.properties['_bundle'] %}
 
-									{% unless item.variant.title contains 'Default' %}
-										<p class="cart_item__variant">
-											{% for option in item.product.options %}
-												<span><b>{{ option }}</b>: {{ item.variant.options[forloop.index0] }}</span>
-											{% endfor %}
-										</p>
-									{% endunless %}
+              {% if bundle_name and bundle_name != current_bundle %}
+                <!-- Bundle Header Row -->
+                <tr class="bundle-group-row">
+                  <td colspan="5">
+                    <h3 class="bundle-title">Bundle: {{ bundle_name }}</h3>
+                  </td>
+                </tr>
+                {% assign current_bundle = bundle_name %}
+              {% endif %}
 
-									<div class="cart_item__details">
-										<p class="item_type"><b>{{ 'pages.cart.product_type' | t }}:</b> {{ item.product.type }}</p>
-										<p class="item_vendor"><b>{{ 'pages.cart.product_vendor' | t }}:</b> {{ item.product.vendor }}</p>
-										<p class="item_weight"><b>{{ 'pages.cart.product_weight' | t }}:</b> {{ item.variant.weight | weight_with_unit: item.variant.weight_unit }}</p>
-									</div>
+              <tr class="{% if bundle_name %}bundle-item-row{% endif %}">
+                <td class="column_product_img">
+                  <a href="{{ item.url | within: collections.all }}">
+                    <img class="cart__image" src="{{ item | img_url: '200x' }}" alt="{{ item.title | escape }}">
+                  </a>
+                </td>
 
-									<a class="btn cart_item__remove" href="/cart/change?line={{ forloop.index }}&amp;quantity=0">{{ 'pages.cart.product_remove' | t }}</a>
-								</td>
+                <td class="column_product_info">
+                  <p class="cart_item__name product_name">
+                    <a href="{{ item.url }}">{{ item.product.title }}</a>
+                  </p>
 
-								<td class="column_price">
-									<span class="money">{{ item.price | money }}</span>
-								</td>
+                  {% unless item.variant.title contains 'Default' %}
+                    <p class="cart_item__variant">
+                      {% for option in item.product.options %}
+                        <span><b>{{ option }}</b>: {{ item.variant.options[forloop.index0] }}</span>
+                      {% endfor %}
+                    </p>
+                  {% endunless %}
 
-								<td class="column_quantity">
-									<div class="quantity_box">
-										<span class="quantity_down"><i class="fa fa-minus" aria-hidden="true"></i></span>
+                  <div class="cart_item__details">
+                    <p class="item_type"><b>{{ 'pages.cart.product_type' | t }}:</b> {{ item.product.type }}</p>
+                    <p class="item_vendor"><b>{{ 'pages.cart.product_vendor' | t }}:</b> {{ item.product.vendor }}</p>
+                    <p class="item_weight"><b>{{ 'pages.cart.product_weight' | t }}:</b> {{ item.variant.weight | weight_with_unit: item.variant.weight_unit }}</p>
+                    
+                    <!-- Bundle Properties Display -->
+                    {% if item.properties['Produkt 1'] %}
+                      <div class="bundle_properties">
+                        <h5 class="bundle_properties_title">Bundle Contents:</h5>
+                        {% for property in item.properties %}
+                          {% unless property.first == '_' %}
+                            <p class="bundle_property">
+                              <strong>{{ property.first }}:</strong> {{ property.last }}
+                            </p>
+                          {% endunless %}
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                    
+                  </div>
 
-										<input id="updates_{{ item.key }}" name="updates[]" value="{{ item.quantity }}" class="quantity_input" type="text">
-										
-										<span class="quantity_up"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                  <a class="btn cart_item__remove" href="/cart/change?line={{ forloop.index }}&amp;quantity=0">
+                    {{ 'pages.cart.product_remove' | t }}
+                  </a>
+                </td>
 
-										<button type="submit" name="update" class="btn">{{ 'pages.cart.product_update' | t }}</button>
-									</div>
-								</td>
+                <td class="column_price">
+                  <span class="money">{{ item.price | money }}</span>
+                </td>
 
-								<td class="column_total">
-									<span class="money">{{ item.line_price | money }}</span>
-								</td>
-							</tr>
-						{% endfor %}
-					</tbody>
+                <td class="column_quantity">
+                  <div class="quantity_box">
+                    <span class="quantity_down"><i class="fa fa-minus" aria-hidden="true"></i></span>
+                    <input id="updates_{{ item.key }}" name="updates[]" value="{{ item.quantity }}" class="quantity_input" type="text">
+                    <span class="quantity_up"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                    <button type="submit" name="update" class="btn">{{ 'pages.cart.product_update' | t }}</button>
+                  </div>
+                </td>
 
-					<tfoot>
-						<tr>
-							<td colspan="5">
-								<p class="cart_total">{{ 'pages.cart.total_weight' | t }} <span>{{ cart.total_weight | weight_with_unit }}</span></p>
-							</td>
-						</tr>
+                <td class="column_total">
+                  <span class="money">{{ item.line_price | money }}</span>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
 
-						<tr>
-							<td colspan="5">
-								<p class="cart_total">{{ 'pages.cart.total_price' | t }} <span class="money">{{ cart.total_price | money }}</span></p>
-							</td>
-						</tr>
+          <tfoot>
+            <tr>
+              <td colspan="5">
+                <p class="cart_total">{{ 'pages.cart.total_weight' | t }} <span>{{ cart.total_weight | weight_with_unit }}</span></p>
+              </td>
+            </tr>
 
-						<tr>
-							<td colspan="5">
-								<label for="cart_note">{{ 'pages.cart.add_note' | t }}</label>
-								<textarea name="note" id="cart_note">{{ cart.note }}</textarea>
+            <tr>
+              <td colspan="5">
+                <p class="cart_total">{{ 'pages.cart.total_price' | t }} <span class="money">{{ cart.total_price | money }}</span></p>
+              </td>
+            </tr>
 
-								{% assign shop_name = shop.name | capitalize %}
-								<p class="alert alert-warning">{{ 'pages.cart.currency_notification' | t: shop_name: shop_name, shop_currency: shop.currency }}</p>
-							</td>
-						</tr>
+            <tr>
+              <td colspan="5">
+                <label for="cart_note">{{ 'pages.cart.add_note' | t }}</label>
+                <textarea name="note" id="cart_note">{{ cart.note }}</textarea>
 
-						{% if additional_checkout_buttons %}
-							{% comment %}Paypal and Google checkout buttons{% endcomment %}
-							<tr>
-								<td colspan="5">
-									{{ content_for_additional_checkout_buttons }}
-								</td>
-							</tr>
-						{% endif %}
+                {% assign shop_name = shop.name | capitalize %}
+                <p class="alert alert-warning">{{ 'pages.cart.currency_notification' | t: shop_name: shop_name, shop_currency: shop.currency }}</p>
+              </td>
+            </tr>
 
-						{% if cart.total_discounts > 0 %}
-							<tr>
-								<td colspan="5">
-									{{ 'pages.cart.savings' | t }}
-									<span class="cart__savings-amount">{{ cart.total_discounts | money }}</span>
-								</td>
-							</tr>
-						{% endif %}
+            {% if additional_checkout_buttons %}
+              <tr>
+                <td colspan="5">
+                  {{ content_for_additional_checkout_buttons }}
+                </td>
+              </tr>
+            {% endif %}
 
-						<tr>
-							<td colspan="5">
-								<a class="btn" href="/collections">{{ 'pages.cart.continue_shopping' | t }}</a>
-								<button type="submit" name="checkout" class="btn btn_alt">{{ 'pages.cart.proceed_to_checkout' | t }}</button>
-								<div class="clearfix"></div>
-							</td>
-						</tr>
-					</tfoot>
-				</table>
-			</form>
-		{% else %}
-			<div class="cart_empty">
-				<p class="alert alert-warning">{{ 'pages.cart.empty_cart_1' | t }}. <a href="/collections">{{ 'pages.cart.empty_cart_2' | t }}</a>.</p>
-			</div>
-		{% endif %}
-	</div>
+            {% if cart.total_discounts > 0 %}
+              <tr>
+                <td colspan="5">
+                  {{ 'pages.cart.savings' | t }}
+                  <span class="cart__savings-amount">{{ cart.total_discounts | money }}</span>
+                </td>
+              </tr>
+            {% endif %}
+
+            <tr>
+              <td colspan="5">
+                <a class="btn" href="/collections">{{ 'pages.cart.continue_shopping' | t }}</a>
+                <button type="submit" name="checkout" class="btn btn_alt">{{ 'pages.cart.proceed_to_checkout' | t }}</button>
+                <div class="clearfix"></div>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </form>
+    {% else %}
+      <div class="cart_empty">
+        <p class="alert alert-warning">{{ 'pages.cart.empty_cart_1' | t }}. 
+          <a href="/collections">{{ 'pages.cart.empty_cart_2' | t }}</a>.
+        </p>
+      </div>
+    {% endif %}
+  </div>
 </div>
+
+<style>
+/* Bundle Styling */
+.bundle-group-row {
+  background: #f7f7f7;
+}
+.bundle-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: bold;
+}
+.bundle-item-row td {
+  border-top: none;
+}
+
+/* Bundle Properties Styling */
+.bundle_properties {
+  margin-top: 15px;
+  padding: 15px;
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+}
+
+.bundle_properties_title {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 14px;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+
+.bundle_property {
+  margin: 5px 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.bundle_property strong {
+  color: #333;
+  font-weight: bold;
+}
+
+/* Highlight bundle savings */
+.bundle_property:contains("Bundle Savings") {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.bundle_property:contains("Individual Total") {
+  color: #666;
+  text-decoration: line-through;
+}
+</style>

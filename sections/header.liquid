@@ -349,6 +349,27 @@
 															<a class="product_title" href="{{ item.product.url }}">{{ item.product.title | truncate:50 }}</a>
 															<span class="money">{{ item.price | money }}</span>
 															<p class="product_quantity">x{{ item.quantity }}</p>
+															
+															<!-- Bundle Items in Mini Cart -->
+															{% if item.properties['Produkt 1'] %}
+																<div class="mini_cart_bundle_items">
+																	<p class="mini_bundle_header"><strong>Bundle Contents:</strong></p>
+																	{% for property in item.properties %}
+																		{% unless property.first == '_' %}
+																			{% if property.first contains 'Produkt' %}
+																				<p class="mini_bundle_item">{{ property.last }}</p>
+																			{% endif %}
+																		{% endunless %}
+																	{% endfor %}
+																	{% assign bundle_savings = item.properties['Bundle Ersparnis'] %}
+																	{% if bundle_savings and bundle_savings != blank %}
+																		<p class="mini_bundle_savings">
+																			<strong>Bundle Ersparnis:</strong> {{ bundle_savings }}
+																		</p>
+																	{% endif %}
+																</div>
+															{% endif %}
+															
 															<a class="item_remove_btn" href="#" item-id="{{ item.id }}"><i class="fa fa-trash"></i></a>
 														</div>
 													</li>
@@ -384,6 +405,41 @@
 	#page_header .level_1__link:hover {color: {{  section.settings.main_header_hover_color }} !important;} 
 	#page_header .header_cart:hover .cart_link {color: {{  section.settings.main_header_hover_color }} !important;} 
 	#page_header .level_1__link.active  {color: {{  section.settings.main_header_hover_color }} !important;} 
+	
+	/* Mini Cart Bundle Items */
+	.mini_cart_bundle_items {
+		margin-top: 5px;
+		padding: 5px;
+		background: #f8f9fa;
+		border-radius: 3px;
+		font-size: 11px;
+	}
+	
+	.mini_bundle_item {
+		margin: 2px 0;
+		line-height: 1.2;
+	}
+	
+	.mini_bundle_item strong {
+		color: #333;
+		font-size: 10px;
+	}
+	
+	.mini_bundle_savings {
+		margin: 3px 0 0 0;
+		color: #28a745;
+		font-weight: bold;
+		font-size: 10px;
+	}
+	
+	.mini_bundle_header {
+		margin: 0 0 5px 0;
+		font-size: 11px;
+		color: #333;
+		font-weight: bold;
+		border-bottom: 1px solid #ddd;
+		padding-bottom: 2px;
+	}
 </style>
 
 {% schema %}
