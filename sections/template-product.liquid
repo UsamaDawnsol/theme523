@@ -6,14 +6,17 @@
 {%- assign productJSON = product | json -%}
 
 {%- for var in product.variants -%}
+	{%- if var.id -%}
 	{%- assign varIDold = '"id":' | append: var.id | append:',' -%}
-	{%- assign varQ = '"inventory_quantity":' | append: var.inventory_quantity | append:',' -%}
+		{%- assign inventory_qty = var.inventory_quantity | default: 0 -%}
+		{%- assign varQ = '"inventory_quantity":' | append: inventory_qty | append:',' -%}
 	{%- assign varIDnew = varIDold | append: varQ -%}
 
 	{%- if productJSONnew.size > 0 -%}
 		{%- assign productJSONnew = productJSONnew | replace: varIDold, varIDnew -%}
 	{%- else -%}
 		{%- assign productJSONnew = productJSON | replace: varIDold, varIDnew -%}
+		{%- endif -%}
 	{%- endif -%}
 {%- endfor -%}
 
@@ -22,7 +25,7 @@
 </script>
 
 <script type="application/json" id="variant_weights_{{ section.id }}">
-	{% raw %}{{% endraw %}{% for variant in product.variants %}{% if forloop.last %}"{{ variant.id }}":"{{ variant.weight | weight_with_unit: variant.weight_unit }}"{% else %}"{{ variant.id }}":"{{ variant.weight | weight_with_unit: variant.weight_unit }}",{% endif %}{% endfor %}{% raw %}}{% endraw %}
+	{% raw %}{{% endraw %}{% for variant in product.variants %}{% if variant.id %}{% assign variant_weight = variant.weight | default: 0 %}{% if forloop.last %}"{{ variant.id }}":"{{ variant_weight | weight_with_unit: variant.weight_unit }}"{% else %}"{{ variant.id }}":"{{ variant_weight | weight_with_unit: variant.weight_unit }}",{% endif %}{% endif %}{% endfor %}{% raw %}}{% endraw %}
 </script>
 
 <script>
@@ -177,8 +180,95 @@
   </div>
 {% endif %}
 
+{% if product.tags contains 'user-collection' %}
+  <div class="user_collection_bundle">
+    <div class="bundle_header">
+      <h4 class="bundle_title">Build Your Collection:</h4>
+      <div class="bundle_savings_info">
+        <span class="bundle_savings">Save up to 20%</span>
+      </div>
+    </div>
 
-{% if section.settings.show_bundle_quantity and product.metafields.custom.bundles_with_quantity %}
+    <div class="discount_tiers">
+      <div class="discount_tier">
+        <span class="tier_count">3<span class="tier_subtitle">items</span></span>
+        <span class="tier_discount">10% OFF</span>
+      </div>
+      <div class="discount_tier">
+        <span class="tier_count">4<span class="tier_subtitle">items</span></span>
+        <span class="tier_discount">15% OFF</span>
+      </div>
+      <div class="discount_tier">
+        <span class="tier_count">6<span class="tier_subtitle">items</span></span>
+        <span class="tier_discount">20% OFF</span>
+      </div>
+    </div>
+
+    <div class="collection_products" id="collection_products">
+      {% assign user_collection = collections['user-collection'] %}
+      {% if user_collection %}
+        {% for collection_product in user_collection.products limit: 20 %}
+          <div class="collection_product_item" data-product-id="{{ collection_product.id }}" data-variant-id="{{ collection_product.variants.first.id }}" data-price="{{ collection_product.price }}">
+            <div class="product_image">
+              {% if collection_product.featured_image %}
+                <img src="{{ collection_product.featured_image | img_url: '150x150' }}" alt="{{ collection_product.title }}">
+              {% else %}
+                <div class="no_image_placeholder">No Image</div>
+              {% endif %}
+            </div>
+            <div class="product_details">
+              <h5 class="product_title">
+                <a href="{{ collection_product.url }}">{{ collection_product.title }}</a>
+              </h5>
+              <div class="product_price">
+                <span class="money">{{ collection_product.price | money }}</span>
+              </div>
+              <div class="product_variants">
+                {% if collection_product.variants.size > 1 %}
+                  <select class="variant_selector" data-product-id="{{ collection_product.id }}">
+                    {% for variant in collection_product.variants %}
+                      <option value="{{ variant.id }}" data-price="{{ variant.price }}">{{ variant.title }}</option>
+                    {% endfor %}
+                  </select>
+                {% else %}
+                  <div class="single_variant">{{ collection_product.variants.first.title }}</div>
+                {% endif %}
+              </div>
+              <div class="add_to_collection">
+                <button type="button" class="btn btn-sm add_to_collection_btn" data-product-id="{{ collection_product.id }}">
+                  Add
+                </button>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <div class="selected_items" id="selected_items" style="display: none;">
+      <h5>Selected Items:</h5>
+      <div class="selected_items_list" id="selected_items_list"></div>
+      <div class="collection_total">
+        <div class="total_breakdown">
+          <div class="subtotal">
+            <span>Subtotal:</span>
+            <span class="money" id="collection_subtotal">$0.00</span>
+          </div>
+          <div class="discount">
+            <span>Discount:</span>
+            <span class="money" id="collection_discount">$0.00</span>
+          </div>
+          <div class="total">
+            <span>Total:</span>
+            <span class="money" id="collection_total">$0.00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="collection_items_data" style="display:none;"></div>
+{% elsif section.settings.show_bundle_quantity and product.metafields.custom.bundles_with_quantity %}
   <div class="enhanced_bundle_items">
     <div class="bundle_header">
       <h4 class="bundle_title">Bundle Contents:</h4>
@@ -319,7 +409,7 @@
               <div class="individual_total">
                 <span>Individual Total:</span>
                 <span class="money">{{ total_individual_price | money }}</span>
-              </div>
+        </div>
               <div class="bundle_price">
                 <span>Bundle Price:</span>
                 <span class="money">{{ product.price | money }}</span>
@@ -1180,6 +1270,240 @@
 body.popup_open {
     overflow: hidden;
 }
+
+.user_collection_bundle {
+    margin: 20px 0;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+.discount_tiers {
+    display: flex;
+    gap: 15px;
+    margin: 15px 0;
+    justify-content: center;
+}
+
+.discount_tier {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 15px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    min-width: 80px;
+}
+
+.discount_tier.active {
+    border-color: #28a745;
+    background: #f8fff9;
+}
+
+.tier_count {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.tier_subtitle {
+    font-size: 12px;
+    color: #666;
+    display: block;
+}
+
+.tier_discount {
+    font-size: 14px;
+    font-weight: bold;
+    color: #28a745;
+    margin-top: 5px;
+}
+
+.collection_products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.collection_product_item {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 15px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.collection_product_item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.collection_product_item.selected {
+    border-color: #28a745;
+    background: #f8fff9;
+}
+
+.product_image {
+    width: 100%;
+    height: 150px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.product_image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product_title {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    line-height: 1.3;
+}
+
+.product_title a {
+    color: #333;
+    text-decoration: none;
+}
+
+.product_title a:hover {
+    color: #7e7f66;
+}
+
+.product_price {
+    font-size: 16px;
+    font-weight: bold;
+    color: #7e7f66;
+    margin-bottom: 8px;
+}
+
+.product_variants {
+    margin-bottom: 10px;
+}
+
+.variant_selector {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.single_variant {
+    font-size: 12px;
+    color: #666;
+    padding: 5px;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.add_to_collection_btn {
+    width: 100%;
+    background: #7e7f66;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s ease;
+}
+
+.add_to_collection_btn:hover {
+    background: #6a6b5a;
+}
+
+.add_to_collection_btn.added {
+    background: #28a745;
+}
+
+.selected_items {
+    margin-top: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.selected_items h5 {
+    margin: 0 0 15px 0;
+    color: #333;
+}
+
+.selected_items_list {
+    margin-bottom: 15px;
+}
+
+.selected_item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.selected_item:last-child {
+    border-bottom: none;
+}
+
+.selected_item_name {
+    flex: 1;
+    font-size: 14px;
+}
+
+.selected_item_price {
+    font-weight: bold;
+    color: #7e7f66;
+}
+
+.remove_item_btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-left: 10px;
+}
+
+.collection_total {
+    border-top: 2px solid #e0e0e0;
+    padding-top: 15px;
+}
+
+.total_breakdown > div {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.total_breakdown > div:last-child {
+    font-weight: bold;
+    font-size: 16px;
+    color: #28a745;
+    border-top: 1px solid #e0e0e0;
+    padding-top: 8px;
+    margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+    .discount_tiers {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .collection_products {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+    }
+}
 </style>
 
 {% javascript %}
@@ -1864,6 +2188,207 @@ jQuery(document).ready(function($) {
 
 	$(document).ready(function() {
 	});
+
+	// User Collection Bundle Functionality
+	var selectedItems = [];
+	var collectionData = {};
+
+	$(document).on('click', '.add_to_collection_btn', function() {
+		var $btn = $(this);
+		var $item = $btn.closest('.collection_product_item');
+		var productId = $btn.data('product-id');
+		var variantId = $item.data('variant-id');
+		var price = $item.data('price');
+		var title = $item.find('.product_title a').text();
+		var variantTitle = $item.find('.variant_selector option:selected').text() || $item.find('.single_variant').text();
+
+		if ($btn.hasClass('added')) {
+			removeFromCollection(productId);
+			$btn.removeClass('added').text('Add');
+			$item.removeClass('selected');
+		} else {
+			addToCollection(productId, variantId, price, title, variantTitle);
+			$btn.addClass('added').text('Added');
+			$item.addClass('selected');
+		}
+		
+		updateSelectedItems();
+		updateDiscountTiers();
+		updateTotals();
+	});
+
+	$(document).on('change', '.variant_selector', function() {
+		var $selector = $(this);
+		var $item = $selector.closest('.collection_product_item');
+		var selectedOption = $selector.find('option:selected');
+		var newVariantId = selectedOption.val();
+		var newPrice = selectedOption.data('price');
+		var productId = $selector.data('product-id');
+
+		$item.attr('data-variant-id', newVariantId);
+		$item.attr('data-price', newPrice);
+		$item.find('.product_price .money').text(Shopify.formatMoney(newPrice, theme.moneyFormat));
+
+		if (selectedItems.find(item => item.productId === productId)) {
+			updateItemInCollection(productId, newVariantId, newPrice);
+			updateSelectedItems();
+			updateTotals();
+		}
+	});
+
+	function addToCollection(productId, variantId, price, title, variantTitle) {
+		var existingItem = selectedItems.find(item => item.productId === productId);
+		if (existingItem) {
+			existingItem.variantId = variantId;
+			existingItem.price = price;
+			existingItem.variantTitle = variantTitle;
+		} else {
+			selectedItems.push({
+				productId: productId,
+				variantId: variantId,
+				price: price,
+				title: title,
+				variantTitle: variantTitle
+			});
+		}
+	}
+
+	function removeFromCollection(productId) {
+		selectedItems = selectedItems.filter(item => item.productId !== productId);
+	}
+
+	function updateItemInCollection(productId, variantId, price) {
+		var item = selectedItems.find(item => item.productId === productId);
+		if (item) {
+			item.variantId = variantId;
+			item.price = price;
+		}
+	}
+
+	function updateSelectedItems() {
+		var $selectedItems = $('#selected_items');
+		var $selectedList = $('#selected_items_list');
+		
+		if (selectedItems.length === 0) {
+			$selectedItems.hide();
+			return;
+		}
+
+		$selectedItems.show();
+		$selectedList.empty();
+
+		selectedItems.forEach(function(item, index) {
+			var itemHtml = '<div class="selected_item">' +
+				'<span class="selected_item_name">' + item.title + ' (' + item.variantTitle + ')</span>' +
+				'<span class="selected_item_price">' + Shopify.formatMoney(item.price, theme.moneyFormat) + '</span>' +
+				'<button type="button" class="remove_item_btn" data-product-id="' + item.productId + '">Remove</button>' +
+				'</div>';
+			$selectedList.append(itemHtml);
+		});
+	}
+
+	$(document).on('click', '.remove_item_btn', function() {
+		var productId = $(this).data('product-id');
+		removeFromCollection(productId);
+		
+		var $item = $('.collection_product_item[data-product-id="' + productId + '"]');
+		$item.find('.add_to_collection_btn').removeClass('added').text('Add');
+		$item.removeClass('selected');
+		
+		updateSelectedItems();
+		updateDiscountTiers();
+		updateTotals();
+	});
+
+	function updateDiscountTiers() {
+		var itemCount = selectedItems.length;
+		$('.discount_tier').removeClass('active');
+		
+		if (itemCount >= 3) {
+			$('.discount_tier').eq(0).addClass('active');
+		}
+		if (itemCount >= 4) {
+			$('.discount_tier').eq(1).addClass('active');
+		}
+		if (itemCount >= 6) {
+			$('.discount_tier').eq(2).addClass('active');
+		}
+	}
+
+	function updateTotals() {
+		var subtotal = selectedItems.reduce((sum, item) => sum + item.price, 0);
+		var discount = 0;
+		var itemCount = selectedItems.length;
+
+		if (itemCount >= 6) {
+			discount = subtotal * 0.20;
+		} else if (itemCount >= 4) {
+			discount = subtotal * 0.15;
+		} else if (itemCount >= 3) {
+			discount = subtotal * 0.10;
+		}
+
+		var total = subtotal - discount;
+
+		$('#collection_subtotal').text(Shopify.formatMoney(subtotal, theme.moneyFormat));
+		$('#collection_discount').text(Shopify.formatMoney(discount, theme.moneyFormat));
+		$('#collection_total').text(Shopify.formatMoney(total, theme.moneyFormat));
+	}
+
+	// Override add to cart for user collection products
+	$(document).on('submit', 'form[action*="/cart/add"]', function(e) {
+		if (selectedItems.length > 0) {
+			e.preventDefault();
+			addCollectionToCart();
+			return false;
+		}
+	});
+
+	function addCollectionToCart() {
+		var items = selectedItems.map(function(item) {
+			return {
+				id: item.variantId,
+				quantity: 1,
+				properties: {
+					'Collection Item': item.title + ' (' + item.variantTitle + ')'
+				}
+			};
+		});
+
+		var cartData = { items: items };
+
+		$.ajax({
+			url: '/cart/add.js',
+			method: 'POST',
+			data: JSON.stringify(cartData),
+			contentType: 'application/json',
+			dataType: 'json',
+			success: function(data) {
+				showBundleSuccessMessage();
+				updateCartCount();
+				selectedItems = [];
+				updateSelectedItems();
+				updateDiscountTiers();
+				updateTotals();
+				$('.collection_product_item').removeClass('selected');
+				$('.add_to_collection_btn').removeClass('added').text('Add');
+			},
+			error: function(xhr, status, error) {
+				if (xhr.status === 200 && xhr.responseText) {
+					showBundleSuccessMessage();
+					updateCartCount();
+					selectedItems = [];
+					updateSelectedItems();
+					updateDiscountTiers();
+					updateTotals();
+					$('.collection_product_item').removeClass('selected');
+					$('.add_to_collection_btn').removeClass('added').text('Add');
+				} else {
+					alert('Error adding collection to cart. Please try again.');
+				}
+			}
+		});
+	}
 
 });
 {% endjavascript %}
