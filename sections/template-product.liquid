@@ -484,7 +484,12 @@
 						{% endif %}
 
 						<div class="price_and_quantity">
+							<!-- Bold: Memberships (product price) -->
+							{% include 'bold-memberships-price' %}
+							{% if bold_hide_item == false %}
 							<p class="single_product__price"><span id="single_product__price-{{ section.id }}"><span class="money">{{ product.price | money }}</span></span></p>
+							{% endif %}
+							<!-- end Bold code -->
 
 							<div class="single_product__quantity">
 								<label for="single_product__quantity-{{ section.id }}">{{ 'layout.product.quantity' | t }}: </label>
@@ -501,7 +506,12 @@
 						</div>
 						
 						<div class="button_block">
+							<!-- Bold: Memberships (add to cart) -->
+							{% include 'bold-memberships-addtocart' %}
+							{% if bold_hide_item == false %}
 							<button type="submit" name="add" class="btn" id="single_product__addtocart-{{ section.id }}">{{ 'layout.product.add_to_cart' | t }}</button>
+							{% endif %}
+							<!-- end Bold code -->
 								
 							{% if section.settings.show_notify_button %}
 								<span class="btn notify_btn" id="notify_trigger_button">{{ 'layout.product.notify_button' | t }}</span>

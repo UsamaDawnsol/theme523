@@ -1,6 +1,13 @@
+<!-- Bold: Memberships (accounts) -->
+{% include 'bold-memberships-salt' %}
+<!-- end Bold code -->
 <div class="template_customer template_customer__account">
 	<div class="container">
-		<h1 class="page_heading">{{ 'customer.account.title' | t }}, {{ customer.name }} <a class="link_logout" href="/account/logout">{{ 'customer.account.logout' | t }}</a></h1>
+		<h1 class="page_heading">{{ 'customer.account.title' | t }}, {{ customer.name }} <a class="link_logout" href="/account/logout">{{ 'customer.account.logout' | t }}</a>
+		<!-- Bold: Memberships (manage memberships) -->
+		<span class="note"><a href="/apps/memberships/accountDetails/?id={{customer.id}}&h={{bold_memberships_hash}}">Manage Memberships</a></span>
+		<!-- end Bold code -->
+		</h1>
 
 		<h2>{{ 'customer.account.tagline' | t }}</h2>
 

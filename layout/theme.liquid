@@ -75,6 +75,11 @@
 	</head>
 
 	<body class="template-{{ template | split: '.' | first }} {{ settings.color_scheme }}">
+		<!-- Bold: Memberships -->
+		{% if customer %}
+		<div class="bold_customer_id" hidden>{{ customer.id }}</div>
+		{% endif %}
+		<!-- end Bold code -->
 		{% section 'font' %}
 		<div class="page_wrapper">
 

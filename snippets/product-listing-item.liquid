@@ -56,6 +56,9 @@
 		{% endif %}
 
 		<div class="product_prop">
+			<!-- Bold: Memberships (collection price) -->
+			{% include 'bold-memberships-price' %}
+			{% if bold_hide_item == false %}
 			<p class="product_price">
 				{% if product.available %}
 					{% if product.variants.size == 1 %}
@@ -77,6 +80,8 @@
 					<span class="money">{{ product.price | money }}</span>
 				{% endif %}
 			</p>
+			{% endif %}
+			<!-- end Bold code -->
 
 			<p class="product_color">
 				{%- for option in product.options_with_values -%}

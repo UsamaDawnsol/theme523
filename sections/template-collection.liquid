@@ -243,6 +243,11 @@
 
 		<div class="row product_listing__main layout__{{ layout_type }}" id="product_listing__sorted">
 			{% for product in collection.products %}
+				<!-- Bold: Memberships (collection products) -->
+				{% include 'bold-memberships-product' %}
+				{% if bold_hide_item == true %}
+				{% continue %}{% endif %}
+				<!-- end Bold code -->
 				<div class="{{ item_class }} {% cycle 'step6': 'item_6_1', '', '', '', '', '' %} {% cycle 'step4': 'item_4_1', '', '', '' %} {% cycle 'step3': 'item_3_1', '', '' %} {% cycle 'step2': 'item_2_1', '' %}">
 					{% include 'product-listing-item' img_size: product_img_size, img_alignment: product_img_alignment %}
 				</div>
