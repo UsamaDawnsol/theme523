@@ -1,0 +1,39 @@
+{% comment %}
+  Timed Drop Protection Snippet
+  Controls product availability based on drop time
+  Usage: {% include 'timed-drop-protection' %}
+{% endcomment %}
+
+{% assign drop_time = product.metafields.custom.drop_time | date: '%s' %}
+{% assign current_time = 'now' | date: '%s' %}
+{% assign is_drop_active = false %}
+
+{% if drop_time %}
+  {% if current_time >= drop_time %}
+    {% assign is_drop_active = true %}
+  {% endif %}
+{% endif %}
+
+{% comment %} Check if product is sold out {% endcomment %}
+{% assign is_sold_out = false %}
+{% if product.metafields.custom.drop_quantity %}
+  {% assign total_sold = 0 %}
+  {% for variant in product.variants %}
+    {% assign total_sold = total_sold | plus: variant.inventory_quantity %}
+  {% endfor %}
+  {% assign available_quantity = product.metafields.custom.drop_quantity | minus: total_sold %}
+  {% if available_quantity <= 0 %}
+    {% assign is_sold_out = true %}
+  {% endif %}
+{% endif %}
+
+{% comment %} Set variables for use in templates {% endcomment %}
+{% assign drop_not_started = false %}
+{% if drop_time and current_time < drop_time %}
+  {% assign drop_not_started = true %}
+{% endif %}
+
+{% assign drop_sold_out = false %}
+{% if is_drop_active and is_sold_out %}
+  {% assign drop_sold_out = true %}
+{% endif %}

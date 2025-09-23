@@ -1,3 +1,7 @@
+<!-- Bold: Memberships (blog) -->
+{% include 'bold_mem_helper' with 'blog' %}
+<!-- end Bold code -->
+
 {% paginate blog.articles by 12 %}
 	{% unless settings.sidebar_toggle %}
 		<div class="container">

@@ -1,3 +1,7 @@
+<!-- Bold: Memberships (search) -->
+{% include 'bold_mem_helper' with 'search' %}
+<!-- end Bold code -->
+
 {% paginate search.results by 10 %}
 	<div class="template_search">
 		<div {% unless settings.sidebar_toggle %}class="container"{% endunless %}>
@@ -28,11 +32,13 @@
 			{% else %}
 				{% assign search_results = search.results | sort: 'object_type' %}
 				<ul class="search_results">
-				{% for item in search_results %}
-					<!-- Bold: Memberships (search) -->
-					{% include 'bold_mem_helper' with 'search' %}
-					<!-- end Bold code -->
-					<li>
+					{% for item in search_results %}
+						<!-- Bold: Memberships (search) -->
+						{% include 'bold_mem_helper' with 'search' %}
+						{% if bold_hide_item == true %}
+						{% continue %}{% endif %}
+						<!-- end Bold code -->
+						<li>
 							{% if item.object_type == 'product' and item.featured_image %}
 								<a class="search_results__img" href="{{ item.url }}">
 									<img src="{{ item.featured_image.src | img_url: '200x200' }}" alt="{{ item.featured_image.alt | escape }}">
@@ -87,6 +93,8 @@
 				{% for item in search_results limit:10 %}
 					<!-- Bold: Memberships (search) -->
 					{% include 'bold_mem_helper' with 'search' %}
+					{% if bold_hide_item == true %}
+					{% continue %}{% endif %}
 					<!-- end Bold code -->
 					<li>
 						{% if item.object_type == 'product' and item.featured_image %}

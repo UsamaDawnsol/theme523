@@ -157,6 +157,8 @@
 		<script src="{{ 'assets.js' | asset_url }}" defer></script>
 		<script src="{{ 'shop.js' | asset_url }}" defer></script>
 		{{ 'style.scss.css' | asset_url | stylesheet_tag }}
+		{{ 'timed-drop-styles.css' | asset_url | stylesheet_tag }}
+		<script src="{{ 'timed-drop-timer.js' | asset_url }}" defer></script>
 
 		{% if template == 'index' %}
 

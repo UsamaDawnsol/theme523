@@ -1,0 +1,49 @@
+{% comment %}
+  Timed Drop Timer Snippet
+  Displays countdown timer for timed product drops
+  Usage: {% include 'timed-drop-timer' %}
+{% endcomment %}
+
+{% if product.metafields.custom.drop_time %}
+  {% assign drop_time = product.metafields.custom.drop_time | date: '%Y-%m-%d %H:%M:%S' %}
+  {% assign current_time = 'now' | date: '%Y-%m-%d %H:%M:%S' %}
+  {% assign drop_timestamp = product.metafields.custom.drop_time | date: '%s' %}
+  {% assign current_timestamp = 'now' | date: '%s' %}
+  
+  {% if drop_timestamp > current_timestamp %}
+    <div class="timed-drop-timer" data-drop-time="{{ drop_time }}" data-product-id="{{ product.id }}">
+      <div class="drop-timer-container">
+        <div class="drop-timer-header">
+          <h3 class="drop-timer-title">Drop Release Countdown</h3>
+          <p class="drop-timer-subtitle">This product will be available at the release time</p>
+        </div>
+        
+        <div class="drop-timer-display">
+          <div class="timer-unit">
+            <span class="timer-number" id="days-{{ product.id }}">00</span>
+            <span class="timer-label">Days</span>
+          </div>
+          <div class="timer-unit">
+            <span class="timer-number" id="hours-{{ product.id }}">00</span>
+            <span class="timer-label">Hours</span>
+          </div>
+          <div class="timer-unit">
+            <span class="timer-number" id="minutes-{{ product.id }}">00</span>
+            <span class="timer-label">Minutes</span>
+          </div>
+          <div class="timer-unit">
+            <span class="timer-number" id="seconds-{{ product.id }}">00</span>
+            <span class="timer-label">Seconds</span>
+          </div>
+        </div>
+        
+        <div class="drop-timer-info">
+          <p class="release-time">Release Time: <strong>{{ drop_time | date: '%B %d, %Y at %I:%M %p' }}</strong></p>
+          {% if product.metafields.custom.drop_quantity %}
+            <p class="drop-quantity">Limited to <strong>{{ product.metafields.custom.drop_quantity }}</strong> units</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endif %}

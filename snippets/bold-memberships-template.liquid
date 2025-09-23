@@ -8,7 +8,14 @@
 
 {%if bold_membership_partial_redirect == true %}
 	<script>
-	 top.location = (window.location.href + "?view={{bold_membership_template}}");
+	let reloadLocation = window.location.href;
+	if(reloadLocation.indexOf("?") != -1){
+	    reloadLocation += "&";
+        }
+	 else{
+	 reloadLocation += "?";
+       }
+       top.location = reloadLocation + "view={{bold_membership_template}}";
 	</script>
 {%endif%}
 

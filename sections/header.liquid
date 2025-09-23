@@ -351,20 +351,23 @@
 															<p class="product_quantity">x{{ item.quantity }}</p>
 															
 															<!-- Bundle Items in Mini Cart -->
-															{% if item.properties['Produkt 1'] %}
+															{% assign bundle_count = item.properties['Bundle Items Count'] %}
+															{% if bundle_count and bundle_count != blank %}
 																<div class="mini_cart_bundle_items">
-																	<p class="mini_bundle_header"><strong>Bundle Contents:</strong></p>
-																	{% for property in item.properties %}
-																		{% unless property.first == '_' %}
-																			{% if property.first contains 'Produkt' %}
-																				<p class="mini_bundle_item">{{ property.last }}</p>
-																			{% endif %}
-																		{% endunless %}
+																	<p class="mini_bundle_header"><strong>Bundle Items:</strong></p>
+																	{% for i in (1..bundle_count) %}
+																		{% assign bundle_item_key = 'Bundle Item ' | append: i %}
+																		{% assign bundle_item_value = item.properties[bundle_item_key] %}
+																		{% if bundle_item_value and bundle_item_value != blank %}
+																			<p class="mini_bundle_item">
+																				<strong>Item {{ i }}:</strong> {{ bundle_item_value }}
+																			</p>
+																		{% endif %}
 																	{% endfor %}
-																	{% assign bundle_savings = item.properties['Bundle Ersparnis'] %}
+																	{% assign bundle_savings = item.properties['Bundle Savings'] %}
 																	{% if bundle_savings and bundle_savings != blank %}
 																		<p class="mini_bundle_savings">
-																			<strong>Bundle Ersparnis:</strong> {{ bundle_savings }}
+																			<strong>Bundle Savings:</strong> {{ bundle_savings }}
 																		</p>
 																	{% endif %}
 																</div>

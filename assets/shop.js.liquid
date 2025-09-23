@@ -174,8 +174,7 @@ jQuery(function($){
 
 
 // PRODUCT QUICK VIEW MINI
-// COMMENTED OUT - This was causing JavaScript syntax errors due to Liquid template syntax
-// The quick view functionality is now handled in the main product template
+//jQuery(function(e){e(document.body).on("click",".quick_view_btn",function(i){i.preventDefault();e(document.body).append('<div id="product_quick_view" style="display: none;"><div class="product_quick_wrapper"><div class="quick_view__left"><div id="img_big"></div><div class="product_images"><div id="img_gallery" class="swiper-container"><div class="swiper-wrapper"></div><div id="img_gallery__prev" class="swiper_btn btn_prev"></div><div id="img_gallery__next" class="swiper_btn btn_next"></div></div></div></div><div class="quick_view__right"><form action="/cart/add" method="post" enctype="multipart/form-data" id="product-actions" class="quick_view_form"><p id="quick_view__name" class="product_name"></p><p id="quick_view__type"><label for="">{% assign X = 'layout.product.product_type' | t %}{% if X.size > 0 %}{{ X }}{% else %}Product type{% endif %}:</label> <span></span></p><p id="quick_view__vendor"><label for="">{% assign X = 'layout.product.vendor' | t %}{% if X.size > 0 %}{{ X }}{% else %}Vendor{% endif %}:</label> <span></span></p><p id="quick_view__variants"><label for="">{% assign X = 'layout.product.options' | t %}{% if X.size > 0 %}{{ X }}{% else %}Options{% endif %}:</label><select id="product-select" name="id" class="hidden"></select></p><p id="quick_view__price" class="product_price"></p><p id="quick_view__availability"><label for="">{% assign X = 'layout.product.availability' | t %}{% if X.size > 0 %}{{ X }}{% else %}Availability{% endif %}:</label> <span></span></p><div id="quick_view__form"><label for="quantity">{% assign X = 'layout.product.choose_quantity' | t %}{% if X.size > 0 %}{{ X }}{% else %}Choose quantity{% endif %}:</label><div class="quantity_box"><input min="1" type="text" name="quantity" value="1" class="quantity_input" /><span class="quantity_modifier quantity_down"><i class="fa fa-minus"></i></span><span class="quantity_modifier quantity_up"><i class="fa fa-plus"></i></span></div><button class="btn btn-cart" type="submit" id="quick_view__add">{% assign X = 'layout.product.add_to_cart' | t %}{% if X.size > 0 %}{{ X }}{% else %}Add to cart{% endif %}</button></div></form></div></div></div>'),e.fancybox.showLoading(),e.fancybox.helpers.overlay.open({parent:e("body")});e.getJSON(e(this).attr("href")+".js",function(i){if(e(document).on("click","#img_gallery a",function(i){i.preventDefault();var a=e(this).attr("href");e("#product_quick_view #img_big img").attr("src",a)}),i.title.length<60)var a=i.title;else var a=e.trim(i.title).substring(0,75)+"...";e("#quick_view__name").html('<a href="'+i.url+'">'+a+"</a>"),e("#quick_view__type span").html(i.type),e("#quick_view__vendor span").html(i.vendor),e.each(i.variants,function(i,a){e("#product-select").append('<option value="'+a.id+'">'+a.title+" - "+a.price+"</option>")}),e("#quantity").on("focusout",function(){var i=e(this).val();e(this).val(isNaN(parseFloat(i))&&!isFinite(i)||0==parseInt(i)||""==i?1:parseInt(i)<0?parseInt(i)-2*parseInt(i):parseInt(i))}),e("#quantity_up").on("click",function(){var i=e("#quantity").val();e("#quantity").val(!isNaN(parseFloat(i))&&isFinite(i)?parseInt(i)+1:1)}),e("#quantity_down").on("click",function(){var i=e("#quantity").val();e("#quantity").val(!isNaN(parseFloat(i))&&isFinite(i)&&i>1?parseInt(i)-1:1)}),e.getScript("{{ 'option_selection.js' | shopify_asset_url }}",function(){function a(i,a){var t=i.length;0===t&&a();var n=0;e(i).each(function(){e("<img>").attr("src",this).load(function(){n++,n===t&&a()})})}a(i.images,function(){if(i.images.length>0){e("#product_quick_view #img_big").append('<img src="'+i.images[0]+'" alt="" />'),e.each(i.images,function(i,a){e("#img_gallery .swiper-wrapper").append('<a class="swiper-slide" href="'+a+'"><img src="'+a+'" alt="" /></a>')})}else{e("#product_quick_view #img_big").append('<img src="{{ 'no_image.png' | asset_url }}" alt="" />')}var a=(new Swiper("#img_gallery",{width:302,loop:!0,speed:500,slidesPerView:3,spaceBetween:10,prevButton:"#img_gallery__prev",nextButton:"#img_gallery__next"}),function(i,a){if(i&&i.available?(jQuery("#quick_view__add").removeAttr("disabled").removeClass("disabled"),i.price<i.compare_at_price?jQuery("#quick_view__price").html('<span class="money">'+Shopify.formatMoney(i.price,"{{ shop.money_format }}")+'</span><span class="money compare-at-price money_sale">'+Shopify.formatMoney(i.compare_at_price,"{{ shop.money_format }}")+'</span><span class="money_sale_percent">– '+parseInt(100-100*i.price/i.compare_at_price)+"%</span>"):jQuery("#quick_view__price").html('<span class="money">'+Shopify.formatMoney(i.price,"{{ shop.money_format }}")+"</span>"),null!=i.inventory_management?jQuery("#quick_view__availability span").removeClass("notify_danger").addClass("notify_success").html("{{'layout.product.available' | t }}"):jQuery("#quick_view__availability span").removeClass("notify_danger").addClass("notify_success").html("{{ 'layout.product.available' | t }}")):(jQuery("#quick_view__add").addClass("disabled").attr("disabled","disabled"),jQuery("#quick_view__availability span").removeClass("notify_success").addClass("notify_danger").html("{% assign X = 'layout.product.unavailable' | t %}{% if X.size > 0 %}{{ X }}{% else %}Unavailable{% endif %}"),jQuery("#quick_view__price").html('<span class="money">'+Shopify.formatMoney(i.price,"{{ shop.money_format }}")+"</span>")),i&&i.featured_image){var t=e("#img_big img"),n=i.featured_image,s=t[0];Shopify.Image.switchImage(n,s,function(i,a,t){e("#img_big img").attr("src",i)})}currencyToggle("#quick_view__price .money")});new Shopify.OptionSelectors("product-select",{product:i,onVariantSelected:a,enableHistoryState:!1}),e.each(e("#quick_view__variants select option"),function(){"Default Title"==e(this).val()&&e("#quick_view__variants").hide()}),e.fancybox(e("#product_quick_view"),{openSpeed:500,closeSpeed:500,tpl:{wrap:'<div id="quick_view__wrap" class="fancybox-wrap" tabIndex="-1"><div class="fancybox-skin"><div class="fancybox-outer"><div class="fancybox-inner"></div></div></div></div>',closeBtn:'<a title="Close" id="quick_view__close" class="fancybox-item fancybox-close" href="javascript:;"></a>'},afterClose:function(){e("#product_quick_view").remove()}})})}),e("#quick_view__add").on("click",function(){e.fancybox.close()})})})});
 
 
 
@@ -185,7 +184,7 @@ jQuery(function($){
 			e.preventDefault();
 
 			// CONSTRUCTING QUICK VIEW MODAL
-			$(document.body).append('<div id="product_quick_view" style="display: none;"><div class="product_quick_wrapper"><div class="quick_view__left"><div id="img_gallery__prev" class="swiper_btn btn_prev"></div><div id="img_gallery__next" class="swiper_btn btn_next"></div><div class="product_images"><div id="img_gallery" class="swiper-container"><div class="swiper-wrapper"></div></div></div><div id="img_big"></div></div><div class="quick_view__right"><form action="/cart/add" method="post" enctype="multipart/form-data" id="product-actions" class="quick_view_form"><p id="quick_view__name" class="product_name"></p><p id="quick_view__availability"><label for="">Availability:</label> <span></span></p><p id="quick_view__price" class="product_price"></p><p id="quick_view__description"></p><p id="quick_view__type"><label for="">Product Type:</label> <span></span></p><p id="quick_view__vendor"><label for="">Vendor:</label> <span></span></p><p id="quick_view__variants"><label for="">Options:</label><select id="product-select" name="id" class="hidden"></select></p><div id="quick_view_colors"></div><div id="quick_view_size"></div><div id="quick_view__form"><label for="quantity">Choose Quantity:</label><div class="quantity_box"><span class="quantity_modifier quantity_down"><i class="fa fa-minus"></i></span><input min="1" type="text" name="quantity" value="1" class="quantity_input" /><span class="quantity_modifier quantity_up"><i class="fa fa-plus"></i></span></div><button class="btn btn-cart" type="submit" id="quick_view__add">Add to Cart</button></div></form><div id="product_info_link"><a href="#">View Info</a></div></div></div></div>');
+			$(document.body).append('<div id="product_quick_view" style="display: none;"><div class="product_quick_wrapper"><div class="quick_view__left"><div id="img_gallery__prev" class="swiper_btn btn_prev"></div><div id="img_gallery__next" class="swiper_btn btn_next"></div><div class="product_images"><div id="img_gallery" class="swiper-container"><div class="swiper-wrapper"></div></div></div><div id="img_big"></div></div><div class="quick_view__right"><form action="/cart/add" method="post" enctype="multipart/form-data" id="product-actions" class="quick_view_form"><p id="quick_view__name" class="product_name"></p><p id="quick_view__availability"><label for="">{{ 'layout.product.availability' | t }}:</label> <span></span></p><p id="quick_view__price" class="product_price"></p><p id="quick_view__description"></p><p id="quick_view__type"><label for="">{{ 'layout.product.product_type' | t }}:</label> <span></span></p><p id="quick_view__vendor"><label for="">{{ 'layout.product.vendor' | t }}:</label> <span></span></p><p id="quick_view__variants"><label for="">{{ 'layout.product.options' | t }}:</label><select id="product-select" name="id" class="hidden"></select></p><div id="quick_view_colors"></div><div id="quick_view_size"></div><div id="quick_view__form"><label for="quantity">{{ 'layout.product.choose_quantity' | t }}:</label><div class="quantity_box"><span class="quantity_modifier quantity_down"><i class="fa fa-minus"></i></span><input min="1" type="text" name="quantity" value="1" class="quantity_input" /><span class="quantity_modifier quantity_up"><i class="fa fa-plus"></i></span></div><button class="btn btn-cart" type="submit" id="quick_view__add">{{ 'layout.product.add_to_cart' | t }}</button></div></form><div id="product_info_link"><a href="#">{{ 'layout.product.view_info' | t }}</a></div></div></div></div>');
 
 			// SHOWING FANCYBOX LOADING ANIMATION
 			$.fancybox.showLoading();
@@ -233,7 +232,7 @@ jQuery(function($){
 				$("#quantity").on("focusout",function(){var t=$(this).val();$(this).val(isNaN(parseFloat(t))&&!isFinite(t)||0==parseInt(t)||""==t?1:parseInt(t)<0?parseInt(t)-2*parseInt(t):parseInt(t))}),$("#quantity_up").on("click",function(){var t=$("#quantity").val();$("#quantity").val(!isNaN(parseFloat(t))&&isFinite(t)?parseInt(t)+1:1)}),$("#quantity_down").on("click",function(){var t=$("#quantity").val();$("#quantity").val(!isNaN(parseFloat(t))&&isFinite(t)&&t>1?parseInt(t)-1:1)});
 
 				// UPLOADING option_selection.js TO MANAGE PRODUCT VARIANTS
-				$.getScript( "/assets/option_selection.js", function() {
+				$.getScript( "{{ 'option_selection.js' | shopify_asset_url }}", function() {
 
 					// IMAGES PRELOADER (FUNCTION)
 					function preloadImages(images, callback) {
@@ -285,26 +284,26 @@ jQuery(function($){
 
 								// VARIANT PRICES
 								if( variant.price < variant.compare_at_price ){
-									jQuery('#quick_view__price').html('<span class="money">' + Shopify.formatMoney(variant.price, theme.moneyFormat) + '</span><span class="money compare-at-price money_sale">' + Shopify.formatMoney(variant.compare_at_price, theme.moneyFormat) + '</span><span class="money_sale_percent">– ' + parseInt( 100 - ( variant.price*100 )/variant.compare_at_price ) + '%</span>');
+									jQuery('#quick_view__price').html('<span class="money">' + Shopify.formatMoney(variant.price, "{{ shop.money_format }}") + '</span><span class="money compare-at-price money_sale">' + Shopify.formatMoney(variant.compare_at_price, "{{ shop.money_format }}") + '</span><span class="money_sale_percent">– ' + parseInt( 100 - ( variant.price*100 )/variant.compare_at_price ) + '%</span>');
 								}
 								else {
-									jQuery('#quick_view__price').html('<span class="money">' + Shopify.formatMoney(variant.price, theme.moneyFormat) + '</span>');
+									jQuery('#quick_view__price').html('<span class="money">' + Shopify.formatMoney(variant.price, "{{ shop.money_format }}") + '</span>');
 								};
 
 								// PRODUCT QUANTITY
 								if ( variant.inventory_management != null ) {
-									jQuery('#quick_view__availability span').removeClass('notify_danger').addClass('notify_success').html('Available');
+									jQuery('#quick_view__availability span').removeClass('notify_danger').addClass('notify_success').html('{{ 'layout.product.available' | t }}');
 								}
 								else {
-									jQuery('#quick_view__availability span').removeClass('notify_danger').addClass('notify_success').html( 'Available' );
+									jQuery('#quick_view__availability span').removeClass('notify_danger').addClass('notify_success').html( '{% assign X = 'layout.product.available' | t %}{% if X.size > 0 %}{{ X }}{% else %}Available{% endif %}' );
 								};
 							} else {
 	
 								jQuery('#quick_view__add').addClass('disabled').attr('disabled', 'disabled'); // set add-to-cart button to unavailable class and disable button
 
-								jQuery('#quick_view__availability span').removeClass('notify_success').addClass('notify_danger').html( 'Unavailable' );
+								jQuery('#quick_view__availability span').removeClass('notify_success').addClass('notify_danger').html( '{% assign X = 'layout.product.unavailable' | t %}{% if X.size > 0 %}{{ X }}{% else %}Unavailable{% endif %}' );
 
-								jQuery('#quick_view__price').html('<span class="money">' + Shopify.formatMoney(variant.price, theme.moneyFormat) + '</span>');
+								jQuery('#quick_view__price').html('<span class="money">' + Shopify.formatMoney(variant.price, "{{ shop.money_format }}") + '</span>');
 							};
 
 
@@ -312,13 +311,13 @@ jQuery(function($){
 
 							// COLOR & SIZE OPTIONS
 							for (var i = 0; i < selector.product.options.length; i++) {
-								if ( selector.product.options[i].name.toLowerCase() == 'color' ) {
+								if ( selector.product.options[i].name.toLowerCase() == '{{ settings.color_option | downcase }}' ) {
 										var selectorNum = i;
 										var selectorName = selector.product.options[i].name;
 
 									renderColorOptions(selectorNum, selectorName);
 								};
-								if ( selector.product.options[i].name.toLowerCase() == 'size' ) {
+								if ( selector.product.options[i].name.toLowerCase() == '{{ settings.size_option | downcase }}' ) {
 										var selectorNum = i;
 										var selectorName = selector.product.options[i].name;
 
@@ -527,37 +526,35 @@ jQuery(function($){
 	clearAllItemsFromCart();
 
 
-	// JQUERY.AJAX-CART.JS MINI - COMMENTED OUT DUE TO LIQUID SYNTAX ERRORS
-	// This minified code was causing JavaScript syntax errors
-	// The AJAX cart functionality is handled elsewhere in the theme
+	// JQUERY.AJAX-CART.JS MINI
+	jQuery(document).ready(function(t){var e={TOTAL_ITEMS:".cart-total-items",TOTAL_PRICE:".cart-total-price",SUBMIT_ADD_TO_CART:"input[type=image], input.submit-add-to-cart",FORM_UPDATE_CART:"form[name=cartform]",FORM_UPDATE_CART_BUTTON:"form[name=cartform] input[name=update]",FORM_UPDATE_CART_BUTTONS:"input[type=image], input.button-update-cart",LINE_ITEM_ROW:".cart-line-item",LINE_ITEM_QUANTITY_PREFIX:"input#updates_",LINE_ITEM_PRICE_PREFIX:".cart-line-item-price-",LINE_ITEM_REMOVE:".remove a",EMPTY_CART_MESSAGE:"#empty"},a=function(t){return Shopify.formatMoney(t,"${% raw %}{{ amount }}{% endraw %}")};t(document).on("submit",'form[action*="/cart/add"]',function(e){e.preventDefault(),t(e.target).find(".btn-cart").attr("disabled",!0).addClass("disabled"),Shopify.addItemFromForm(e.target)}),t(document).on("click",".btn-cart",function(){t.fancybox.showLoading(),t.fancybox.helpers.overlay.open({parent:t("body")})}),t(e.FORM_UPDATE_CART_BUTTON).click(function(a){a.preventDefault(),t(a.target.form).find(e.FORM_UPDATE_CART_BUTTONS).attr("disabled",!0).addClass("disabled"),Shopify.updateCartFromForm(a.target.form)}),t(e.FORM_UPDATE_CART).delegate(e.LINE_ITEM_REMOVE,"click",function(a){a.preventDefault();var i=this.href.split("/").pop().split("?").shift();Shopify.removeItem(i),t(this).parents(e.LINE_ITEM_ROW).remove()}),Shopify.onItemAdded=function(e,a){t(a).find(".btn-cart").attr("disabled",!1).removeClass("disabled"),Shopify.getCart()},Shopify.onCartUpdate=function(i,n){t("#cart_items").html(i.item_count);if(theme.cartAjaxOn){ajaxCartRender();}var r=a(i.total_price);t(e.TOTAL_PRICE).html(r),t(e.EMPTY_CART_MESSAGE).length>0&&0==i.item_count&&(t(e.FORM_UPDATE_CART).hide(),t(e.EMPTY_CART_MESSAGE).show()),n=n||!1,n&&i.item_count>0&&(t.each(i.items,function(i,n){t(e.LINE_ITEM_PRICE_PREFIX+n.id).html(a(n.line_price)),t(e.LINE_ITEM_QUANTITY_PREFIX+n.id).val(n.quantity)}),t(n).find("input[value=0]").parents(e.LINE_ITEM_ROW).remove(),t(n).find(e.FORM_UPDATE_CART_BUTTONS).attr("disabled",!1).removeClass("disabled"))},Shopify.onError=function(){t("form").find(".btn-cart").attr("disabled",!1).removeClass("disabled")}});
 
 
 
 
 
-// JQUERY.API.JS MINI - COMMENTED OUT DUE TO LIQUID SYNTAX ERRORS
-// This minified code was causing JavaScript syntax errors
-// The Shopify API functionality is handled elsewhere in the theme
+// JQUERY.API.JS MINI
+function floatToString(t,a){var e=t.toFixed(a).toString();return e.match(/^\.\d+/)?"0"+e:e}function attributeToString(t){return"string"!=typeof t&&(t+="","undefined"===t&&(t="")),jQuery.trim(t)}"undefined"==typeof Shopify&&(Shopify={}),Shopify.money_format="$ {{amount}}",Shopify.onError=function(XMLHttpRequest,textStatus){var data=eval("("+XMLHttpRequest.responseText+")");alert(data.message+"("+data.status+"): "+data.description)},Shopify.onCartUpdate=function(t){alert("There are now "+t.item_count+" items in the cart.")},Shopify.onItemAdded=function(t){alert(t.title+" was added to your shopping cart.")},Shopify.onProduct=function(t){alert("Received everything we ever wanted to know about "+t.title)},Shopify.formatMoney=function(t,a){var e="",r=/\{\{\s*(\w+)\s*\}\}/,o=a||this.money_format;switch(o.match(r)[1]){case"amount":e=floatToString(t/100,2).replace(/(\d+)(\d{3}[\.,]?)/,"$1 $2");break;case"amount_no_decimals":e=floatToString(t/100,0).replace(/(\d+)(\d{3}[\.,]?)/,"$1 $2");break;case"amount_with_comma_separator":e=floatToString(t/100,2).replace(/\./,",").replace(/(\d+)(\d{3}[\.,]?)/,"$1.$2")}return o.replace(r,e)},Shopify.resizeImage=function(t,a){try{if("original"==a)return t;var e=t.match(/(.*\/[\w\-\_\.]+)\.(\w{2,4})/);return e[1]+"_"+a+"."+e[2]}catch(r){return t}},Shopify.addItem=function(t,a,e){a=a||1;var r={type:"POST",url:"/cart/add.js",data:"quantity="+a+"&id="+t,dataType:"json",success:function(t){"function"==typeof e?e(t):Shopify.onItemAdded(t)},error:function(t,a){Shopify.onError(t,a)}};jQuery.ajax(r)},Shopify.addItemFromForm=function(t,o){var r={type:"POST",url:"/cart/add.js",data:jQuery(t).serialize(),dataType:"json",success:function(r){"function"==typeof o?o(r,t):Shopify.onItemAdded(r,t);$('body').append('<div id="cart_added"><h4>{{'pages.cart.product_added' | t }}</h4><div class="cart_added__row"><div class="cart_added__1" id="cart_added__img"><img src="" alt="" /></div><div class="cart_added__2"><span id="cart_added__name" class="product_name"></span><p id="cart_added__quantity">{{ 'pages.cart.product_quantity' | t }}: <span></span></p><a class="btn" href="/cart">{{ 'pages.cart.go_to_cart' | t }}</a><a class="btn btn-alt" id="cart_added__close" href="#">{{ 'pages.cart.continue_shopping' | t }}</a></div></div></div>');if(r.title.length<60){var productTitle=r.title}else{var productTitle=$.trim(r.title).substring(0,60)+'...'};$('#cart_added__name').html(productTitle);$('#cart_added__quantity span').html(r.quantity);$('#cart_added__close').on('click',function(e){e.preventDefault();$('.fancybox-close').trigger('click')});if(r.image){$('#cart_added__img img').attr('src',r.image).load(function(){$.fancybox.open($('#cart_added'),{'openSpeed':500,'closeSpeed':300,'afterClose':function(){$('#cart_added').remove()}})})}else{$('#cart_added__img').hide();$.fancybox.open($('#cart_added'),{'openSpeed':500,'closeSpeed':300,'afterClose':function(){$('#cart_added').remove()}})}},error:function(t,o){Shopify.onError(t,o);var errorData=eval('('+t.responseText+')');$('body').append('<div id="cart_added" class="cart_error"><h4></h4><p class="alert alert-error"></p></div>');$('#cart_added h4').html(errorData.message);$('#cart_added p').html(errorData.description);$.fancybox.open($('#cart_added'),{'openSpeed':500,'closeSpeed':300,'afterClose':function(){$('#cart_added').remove()}})}};jQuery.ajax(r)},Shopify.getCart=function(t){jQuery.getJSON("/cart.js",function(a){"function"==typeof t?t(a):Shopify.onCartUpdate(a)})},Shopify.getProduct=function(t,a){jQuery.getJSON("/products/"+t+".js",function(t){"function"==typeof a?a(t):Shopify.onProduct(t)})},Shopify.changeItem=function(t,a,e){var r={type:"POST",url:"/cart/change.js",data:"quantity="+a+"&id="+t,dataType:"json",success:function(t){"function"==typeof e?e(t):Shopify.onCartUpdate(t)},error:function(t,a){Shopify.onError(t,a)}};jQuery.ajax(r)},Shopify.removeItem=function(t,a){var e={type:"POST",url:"/cart/change.js",data:"quantity=0&id="+t,dataType:"json",success:function(t){"function"==typeof a?a(t):Shopify.onCartUpdate(t)},error:function(t,a){Shopify.onError(t,a)}};jQuery.ajax(e)},Shopify.clear=function(t){var a={type:"POST",url:"/cart/clear.js",data:"",dataType:"json",success:function(a){"function"==typeof t?t(a):Shopify.onCartUpdate(a)},error:function(t,a){Shopify.onError(t,a)}};jQuery.ajax(a)},Shopify.updateCartFromForm=function(t,a){var e={type:"POST",url:"/cart/update.js",data:jQuery(t).serialize(),dataType:"json",success:function(e){"function"==typeof a?a(e,t):Shopify.onCartUpdate(e,t)},error:function(t,a){Shopify.onError(t,a)}};jQuery.ajax(e)},Shopify.updateCartAttributes=function(t,a){var e="";jQuery.isArray(t)?jQuery.each(t,function(t,a){var r=attributeToString(a.key);""!==r&&(e+="attributes["+r+"]="+attributeToString(a.value)+"&")}):"object"==typeof t&&null!==t&&jQuery.each(t,function(t,a){e+="attributes["+attributeToString(t)+"]="+attributeToString(a)+"&"});var r={type:"POST",url:"/cart/update.js",data:e,dataType:"json",success:function(t){"function"==typeof a?a(t):Shopify.onCartUpdate(t)},error:function(t,a){Shopify.onError(t,a)}};jQuery.ajax(r)},Shopify.updateCartNote=function(t,a){var e={type:"POST",url:"/cart/update.js",data:"note="+attributeToString(t),dataType:"json",success:function(t){"function"==typeof a?a(t):Shopify.onCartUpdate(t)},error:function(t,a){Shopify.onError(t,a)}};jQuery.ajax(e)};
 
 
 
 
 	// WISHLIST ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// WISHLIST FUNCTIONALITY - ENABLED BY DEFAULT
+{% if settings.wishlist_toggle %}
  
 	$(document).on('click', '.wishlist_add', function(e) {
 		e.preventDefault();
 	
 		$(this).parent().submit();
 		
-		$(this).removeClass('wishlist_add').attr('href', '/pages/wishlist').attr('title', 'Added to Wishlist');
+		$(this).removeClass('wishlist_add').attr('href', '/pages/{{ settings.wishlist_page }}').attr('title', '{{ 'layout.wishlist.added_to_wishlist' | t }}');
 		$(this).find('i').removeClass('fa-heart-o').addClass('fa-heart');
 	});
  
 	$(document).on('click', '.wishlist_add_login', function(e) {
 		e.preventDefault();
  
-		$.fancybox( '<p class="alert alert-info">Please login to use wishlist<br /><a class="btn" href="/account/login">Login</a><a class="btn btn-alt wishlist_add_close" href="#">Continue Shopping</a></p>',
+		$.fancybox( '<p class="alert alert-info">{{ 'layout.wishlist.login_to_use_wishlist' | t }}<br /><a class="btn" href="/account/login">{{ 'layout.wishlist.login_btn' | t }}</a><a class="btn btn-alt wishlist_add_close" href="#">{{ 'layout.wishlist.continue_shopping_btn' | t }}</a></p>',
 			{
 				'closeBtn' : false,
 				'tpl': {
@@ -573,7 +570,7 @@ jQuery(function($){
 
 	});
  
-// END WISHLIST FUNCTIONALITY
+{% endif %}
 
 
 
@@ -650,7 +647,7 @@ $.fn.homeSections = function() {
 				userId: feedUser,
 				accessToken: feedToken,
 				limit: feedLimit,
-				template: '<div class="col-xs-2 instagram_item swiper-slide"><a href="{{link}}"><img src="{{image}}" alt=""><div class="info"><span class="likes"><i class="fa fa-heart" aria-hidden="true"></i>{{likes}}</span><span class="comments"><i class="fa fa-comment" aria-hidden="true"></i>{{comments}}</span></div></a></div>',
+				template: {% raw %}'<div class="col-xs-2 instagram_item swiper-slide"><a href="{{link}}"><img src="{{image}}" alt=""><div class="info"><span class="likes"><i class="fa fa-heart" aria-hidden="true"></i>{{likes}}</span><span class="comments"><i class="fa fa-comment" aria-hidden="true"></i>{{comments}}</span></div></a></div>'{% endraw %},
 				resolution: 'low_resolution',
 				error: function( data ) {
 					document.getElementById(feedID).innerHTML = '<p class="alert alert-danger"><b>Instagram error</b><br>' + data + '</p>';
@@ -780,7 +777,7 @@ $('.tab_content_wrapper').each(function(i) {
 
 
 
-// TEXT ANIMATION FUNCTIONALITY - ENABLED BY DEFAULT
+{% if settings.text-animation %}
 // TITLE ANIMATION
 titleAnimationScrollTrack = function(id, effect){
 	$(window).on('load scroll',function(){
@@ -812,8 +809,8 @@ $(window).on('load', function() {
 		titleAnimationScrollTrack(elemId, elemEffect);
 	});	
 });
- 
-// END TEXT ANIMATION FUNCTIONALITY
+
+{% endif %}
 
 
 

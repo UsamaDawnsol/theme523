@@ -24,6 +24,7 @@
 	  {% if customer_tag == bold_rule.first %}
 		{% if bold_rule.last == 'hide' %}
 			{% assign bold_hide_item = true %}
+			{% assign bold_noaccess_snippet = 'bold-memberships-noaccess-' | append: bold_rule.first %}
 		{% endif %}
 		{% if bold_rule.last == 'show' %}
 			{% assign bold_hide_item = false %}

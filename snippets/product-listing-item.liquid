@@ -56,32 +56,32 @@
 		{% endif %}
 
 		<div class="product_prop">
-			<!-- Bold: Memberships (collection price) -->
-			{% include 'bold-memberships-price' %}
-			{% if bold_hide_item == false %}
 			<p class="product_price">
-				{% if product.available %}
-					{% if product.variants.size == 1 %}
+				<!-- Bold: Memberships (collection price) -->
+				{% include 'bold-memberships-price' %}
+				{% if bold_hide_item == false %}
+					{% if product.available %}
+						{% if product.variants.size == 1 %}
+							{% if on_sale %}
+								<span class="money money_sale">{{ product.compare_at_price | money }}</span>
+							{% endif %}
+
+							<span class="money">{{ product.price | money }}</span>
+						{% else %}
+							{% assign prices_sorted = product.variants | sort: 'price' %}
+							<span class="money">{{ prices_sorted.first.price | money }}</span>{% unless prices_sorted.first.price == prices_sorted.last.price %} <span class="money_like">–</span> <span class="money">{{ prices_sorted.last.price | money }}</span>{% endunless %}
+							{% comment %}<span class="money_variants">({{ product.variants | size }} {{ 'layout.product.variants' | t }})</span>{% endcomment %}
+						{% endif %}
+					{% else %}
 						{% if on_sale %}
 							<span class="money money_sale">{{ product.compare_at_price | money }}</span>
 						{% endif %}
 
 						<span class="money">{{ product.price | money }}</span>
-					{% else %}
-						{% assign prices_sorted = product.variants | sort: 'price' %}
-						<span class="money">{{ prices_sorted.first.price | money }}</span>{% unless prices_sorted.first.price == prices_sorted.last.price %} <span class="money_like">–</span> <span class="money">{{ prices_sorted.last.price | money }}</span>{% endunless %}
-						{% comment %}<span class="money_variants">({{ product.variants | size }} {{ 'layout.product.variants' | t }})</span>{% endcomment %}
 					{% endif %}
-				{% else %}
-					{% if on_sale %}
-						<span class="money money_sale">{{ product.compare_at_price | money }}</span>
-					{% endif %}
-
-					<span class="money">{{ product.price | money }}</span>
 				{% endif %}
+				<!-- end Bold code -->
 			</p>
-			{% endif %}
-			<!-- end Bold code -->
 
 			<p class="product_color">
 				{%- for option in product.options_with_values -%}
@@ -97,18 +97,36 @@
 		</div>
 
 		<div class="product_links">
-			<form method="post" action="/cart/add" class="add_to_cart_form">
-				{% if product.available %}
-					{% if product.variants.size == 1 %}
-						<input type="hidden" name="id" value="{{ product.variants.first.id }}" />
-						<button class="btn-cart" type="submit"><i class="fa fa-shopping-cart"></i>{{ 'layout.product.add_to_cart' | t }}</button>
-					{% else %}
-						<a class="btn_options" href="{{ product.url }}"><i class="fa fa-shopping-cart"></i>{{ 'layout.product.choose_variant_button' | t }}</a>
-					{% endif %}
+			<!-- Bold: Memberships (add to cart) -->
+			{% include 'bold-memberships-addtocart' %}
+			{% if bold_hide_item == false %}
+				<!-- Timed Drop Protection -->
+				{% include 'timed-drop-protection' %}
+				{% if drop_not_started %}
+					<button class="btn-cart btn-disabled" disabled>
+						<i class="fa fa-clock-o"></i> Drop Not Available
+					</button>
+				{% elsif drop_sold_out %}
+					<button class="btn-cart btn-disabled" disabled>
+						<i class="fa fa-times"></i> Drop Sold Out
+					</button>
 				{% else %}
-					<button class="btn-cart" disabled><i class="fa fa-ban"></i>{{ 'layout.product.unavailable' | t }}</button>
+					<form method="post" action="/cart/add" class="add_to_cart_form">
+						{% if product.available %}
+							{% if product.variants.size == 1 %}
+								<input type="hidden" name="id" value="{{ product.variants.first.id }}" />
+								<button class="btn-cart" type="submit"><i class="fa fa-shopping-cart"></i>{{ 'layout.product.add_to_cart' | t }}</button>
+							{% else %}
+								<a class="btn_options" href="{{ product.url }}"><i class="fa fa-shopping-cart"></i>{{ 'layout.product.choose_variant_button' | t }}</a>
+							{% endif %}
+						{% else %}
+							<button class="btn-cart" disabled><i class="fa fa-ban"></i>{{ 'layout.product.unavailable' | t }}</button>
+						{% endif %}
+					</form>
 				{% endif %}
-			</form>
+				<!-- end Timed Drop Protection -->
+			{% endif %}
+			<!-- end Bold code -->
 
 			
 			<a class="quick_view_btn" href="{{ product.url }}" title="{{ 'layout.product.quick_view_button' | t }}"><i class="fa fa-search-plus" aria-hidden="true"></i></a>

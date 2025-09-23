@@ -1,9 +1,10 @@
-<!-- Bold: Memberships (page) -->
-{% include 'bold_mem_helper' with 'page' %}
-<!-- end Bold code -->
 <div class="template_page">
 	<div class="container">
 		<h1 class="page_heading">{{ page.title }}</h1>
+
+		<!-- Bold: Memberships (page) -->
+		{% include 'bold_mem_helper' with 'page' %}
+		<!-- end Bold code -->
 
 		<div class="rte">
 			{{ page.content }}

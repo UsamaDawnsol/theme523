@@ -1,3 +1,11 @@
+<!-- Bold: Memberships (product) -->
+{% include 'bold_mem_helper' with 'product' %}
+<!-- end Bold code -->
+
+<!-- Timed Drop Protection -->
+{% include 'timed-drop-protection' %}
+<!-- end Timed Drop code -->
+
 {% assign product_image = true %}
 {% if product.images.size == 0 %}
 	{% assign product_image = false %}
@@ -101,6 +109,10 @@
 
 		<div class="single_product__info {{ product_info_class }}">
 			<h2 itemprop="name" class="single_product__title">{{ product.title }}</h2>
+
+			<!-- Timed Drop Timer -->
+			{% include 'timed-drop-timer' %}
+			<!-- end Timed Drop Timer -->
 
 			<div class="single_product__details">
 				<form action="/cart/add" method="post" enctype="multipart/form-data" data-section="{{ section.id }}">
@@ -484,12 +496,14 @@
 						{% endif %}
 
 						<div class="price_and_quantity">
-							<!-- Bold: Memberships (product price) -->
-							{% include 'bold-memberships-price' %}
-							{% if bold_hide_item == false %}
-							<p class="single_product__price"><span id="single_product__price-{{ section.id }}"><span class="money">{{ product.price | money }}</span></span></p>
-							{% endif %}
-							<!-- end Bold code -->
+							<p class="single_product__price">
+								<!-- Bold: Memberships (product price) -->
+								{% include 'bold-memberships-price' %}
+								{% if bold_hide_item == false %}
+									<span id="single_product__price-{{ section.id }}"><span class="money">{{ product.price | money }}</span></span>
+								{% endif %}
+								<!-- end Bold code -->
+							</p>
 
 							<div class="single_product__quantity">
 								<label for="single_product__quantity-{{ section.id }}">{{ 'layout.product.quantity' | t }}: </label>
@@ -509,7 +523,19 @@
 							<!-- Bold: Memberships (add to cart) -->
 							{% include 'bold-memberships-addtocart' %}
 							{% if bold_hide_item == false %}
-							<button type="submit" name="add" class="btn" id="single_product__addtocart-{{ section.id }}">{{ 'layout.product.add_to_cart' | t }}</button>
+								<!-- Timed Drop Protection -->
+								{% if drop_not_started %}
+									<button type="button" class="btn btn-disabled" disabled>
+										<i class="fa fa-clock-o"></i> Drop Not Yet Available
+									</button>
+								{% elsif drop_sold_out %}
+									<button type="button" class="btn btn-disabled" disabled>
+										<i class="fa fa-times"></i> Drop Sold Out
+									</button>
+								{% else %}
+									<button type="submit" name="add" class="btn" id="single_product__addtocart-{{ section.id }}">{{ 'layout.product.add_to_cart' | t }}</button>
+								{% endif %}
+								<!-- end Timed Drop Protection -->
 							{% endif %}
 							<!-- end Bold code -->
 								
